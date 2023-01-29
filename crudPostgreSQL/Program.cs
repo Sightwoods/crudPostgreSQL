@@ -2,26 +2,31 @@
 using System;
 using System.Data;
 
-class CRUDExample
+class crudPostgreSQL
 {
-    private static string connString = "Server=localhost;Port=5432;User Id=postgres;Password=password;Database=mydb;";
+    private static string connString = "" +
+        "Server=localhost;" +
+        "Port=5432;" +
+        "User Id=postgres;" +
+        "Password=Pg_Root_14;" +
+        "Database=mydb;";
 
     static void Main()
     {
         // Insert a new record
-        InsertRecord("John Doe", "johndoe@example.com");
+        //InsertRecord("John", "john@example.com");
 
         // Read all records
         ReadRecords();
 
         // Update a record
-        UpdateRecord(1, "Jane Doe", "janedoe@example.com");
+        //UpdateRecord(6, "Jane Doe", "janedoe@example.com");
 
         // Read all records
-        ReadRecords();
+        //ReadRecords();
 
         // Delete a record
-        DeleteRecord(1);
+        //DeleteRecord(6);
 
         // Read all records
         ReadRecords();
@@ -36,9 +41,9 @@ class CRUDExample
             using (var cmd = new NpgsqlCommand())
             {
                 cmd.Connection = conn;
-                cmd.CommandText = "INSERT INTO users (name, email) VALUES (@name, @email)";
-                cmd.Parameters.AddWithValue("name", name);
-                cmd.Parameters.AddWithValue("email", email);
+                cmd.CommandText = "SELECT insert_users(@name, @email)";
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@email", email);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -50,14 +55,16 @@ class CRUDExample
         {
             conn.Open();
 
-            using (var cmd = new NpgsqlCommand("SELECT * FROM users", conn))
+            using (var cmd = new NpgsqlCommand("SELECT * FROM get_all_users('users');", conn))
             {
+                cmd.CommandType = CommandType.Text;
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("ID: " + reader.GetInt32(0) + ", Name: " + reader.GetString(1) + ", Email: " + reader.GetString(2));
+                        Console.WriteLine("ID: " + reader["id"] + ", Name: " + reader["name"] + ", Email: " + reader["email"]);
                     }
+                    Console.WriteLine("");
                 }
             }
         }
@@ -72,11 +79,10 @@ class CRUDExample
             using (var cmd = new NpgsqlCommand())
             {
                 cmd.Connection = conn;
-                cmd.CommandText = 
-                    "UPDATE users SET name = @name, email = @email WHERE id = @id";
-                cmd.Parameters.AddWithValue("id", id);
-                cmd.Parameters.AddWithValue("name", name);
-                cmd.Parameters.AddWithValue("email", email);
+                cmd.CommandText = "SELECT update_users(@id,@name,@email)";
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@email", email);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -91,8 +97,8 @@ class CRUDExample
             using (var cmd = new NpgsqlCommand())
             {
                 cmd.Connection = conn;
-                cmd.CommandText = "DELETE FROM users WHERE id = @id";
-                cmd.Parameters.AddWithValue("id", id);
+                cmd.CommandText = "SELECT delete_user(@id)";
+                cmd.Parameters.AddWithValue("@id", id);
                 cmd.ExecuteNonQuery();
             }
         }
