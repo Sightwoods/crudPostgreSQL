@@ -1,0 +1,35 @@
+﻿A continuación te proporciono ejemplos 
+básicos de cómo crear 
+funciones de PostgreSQL para cada operación:
+
+
+CREATE OR REPLACE FUNCTION insert_person(name TEXT, age INT)
+RETURNS VOID AS $$
+BEGIN
+    INSERT INTO person (name, age) VALUES (name, age);
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_person(name TEXT)
+RETURNS TABLE (name TEXT, age INT) AS $$
+BEGIN
+    RETURN QUERY SELECT name, age FROM person WHERE name = name;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION update_person(name TEXT, new_age INT)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE person SET age = new_age WHERE name = name;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION delete_person(name TEXT)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM person WHERE name = name;
+END;
+$$ LANGUAGE plpgsql;
